@@ -13,7 +13,7 @@ from collections import defaultdict
 heuristics = [two_clause_choice]
 # heuristics = [first_choice, random_choice, two_clause_choice]
 
-n = 15
+n = 50
 rand_problem = random_model.generate_random_problem(n, 3 * n)
 print(rand_problem)
 
@@ -35,7 +35,7 @@ for i in range(0, 5):
 
         timer.start()
         sol = solve(rand_instance, rand_assignment, heuristic,
-                    unit_preference_methods.random_choice, False)
+                    unit_preference_methods.random_choice, True)
         tot_time = timer.stop()
         print(f"Elapsed time: {tot_time:0.4f} seconds")
 

@@ -58,9 +58,9 @@ def solve(instance, assignment, splitting, unit, verbose):
             if State.can_try(state[variable_to_try], sat_assignment):
 
                 # Mark this attempt on the state for this variable.
-                state[variable_to_try] = State.TRIED_BOTH
-                # state[variable_to_try] = State.attempted(
-                #     state[variable_to_try], sat_assignment)
+                # state[variable_to_try] = State.TRIED_BOTH
+                state[variable_to_try] = State.attempted(
+                    state[variable_to_try], sat_assignment)
                 assignment[variable_to_try] = sat_assignment
 
                 # Record that we attempted a solution.
@@ -176,7 +176,7 @@ def solve(instance, assignment, splitting, unit, verbose):
                 state[variable_to_try] = State(0)
                 assignment[variable_to_try] = None
                 prev = previous_attempts.pop()
-                assignment[prev[0]] = None
+                # assignment[prev[0]] = None
                 to_attempt.insert(prev[1], prev[0])
 
         # elif not found_sat and state[variable_to_try] == State.TRIED_BOTH:
