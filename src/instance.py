@@ -24,6 +24,9 @@ class State(Enum):
          (state == State.TRIED_FALSE and to_try) or \
           (state == State.TRIED_TRUE and not to_try)
 
+    def __repr__(self):
+        return self.name
+
 
 class Variable():
     def __init__(self, name, index):
@@ -31,10 +34,10 @@ class Variable():
         self.index = index
 
     def __repr__(self):
-        return "Variable: %s, Index: %i" % (self.name, self.index)
+        return "Variable: %s (index: %i)" % (self.name, self.index)
 
     def __str__(self):
-        return "Variable: %s, Index: %i" % (self.name, self.index)
+        return "Variable: %s (index: %i)" % (self.name, self.index)
 
 
 class Literal():
@@ -46,10 +49,25 @@ class Literal():
         # if the variable is negated. Save that here.
         self.encoding = ("-" if negated else "") + str(self.variable.index)
 
+    def eval(self, val):
+        return val ^ self.negated if val is not None else False
+
+    def __repr__(self):
+        return "Literal: %s (index: %i)" % (
+            ("-" if self.negated else "") + self.variable.name,
+            self.variable.index)
+
+    def __str__(self):
+        return "Literal: %s (index: %i)" % (
+            ("-" if self.negated else "") + self.variable.name,
+            self.variable.index)
+
 
 class Clause():
     def __init__(self, literals):
         self.literals = literals
+        self.variable_indexes = [l.variable.index for l in self.literals]
+        self.unassigned = self.variable_indexes
 
     def __getitem__(self, index):
         return self.literals[0]
@@ -60,15 +78,30 @@ class Clause():
     def __contains__(self, item):
         return item in self.get_variable_indexes()
 
-    def get_variable_indexes(self):
-        return [l.variable.index for l in self.literals]
+    def __repr__(self):
+        return "Clause: {}".format(self.literals)
 
-    def count_unassigned(self, assignments):
-        count = 0
-        for var in self.get_variable_indexes():
-            if assignments[var] is None:
-                count += 1
-        return count
+    def __str__(self):
+        return "Clause: {}".format(self.literals)
+
+    def get_literal_from_var(self, var_index):
+        for literal in self.literals:
+            if literal.variable.index == var_index:
+                return literal
+
+    def get_variable_indexes(self):
+        return self.variable_indexes
+
+    def apply_assignment(self, assignment):
+        unassigned = []
+        for var in self.variable_indexes:
+            if assignment[var] is None:
+                unassigned.append(var)
+        self.unassigned = unassigned
+
+    def count_unassigned(self, assignment):
+        self.apply_assignment(assignment)
+        return len(self.unassigned)
 
 
 class Instance():
@@ -77,6 +110,25 @@ class Instance():
         self.variables_lookup = dict()
         self.clauses = []
         self.watchlist = defaultdict(deque)
+        self.n_clauses = defaultdict(list)
+
+    def update_assignment(self, assignment):
+        n_clauses = defaultdict(list)
+
+        for clause in self.clauses:
+
+            # Ensure that we only update for unsat clauses.
+            clause_sat = False
+            for literal in clause:
+                if literal.eval(assignment[literal.variable.index]):
+                    clause_sat = True
+                    break
+
+            if not clause_sat:
+                count = clause.count_unassigned(assignment)
+                n_clauses[count].append(clause)
+
+        self.n_clauses = n_clauses
 
     def parse_problem(self, string_problem):
         for line in string_problem.splitlines():
@@ -124,10 +176,11 @@ class Instance():
     def check_assignment(self, assignment):
 
         # Iterate through each clause.
+        clause_sat = False
         for clause in self.clauses:
 
             # Ensure that at least one literal is true.
-            clause_sat = False
+            # clause_sat = False
             for literal in clause:
                 if literal.eval(assignment[literal.variable.index]):
                     clause_sat = True

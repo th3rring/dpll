@@ -24,6 +24,10 @@ class Timer:
 
         elapsed_time = time.perf_counter() - self._start_time
         self._start_time = None
+        return elapsed_time
+
+    def stop_print(self):
+        elapsed_time = self.stop()
         print(f"Elapsed time: {elapsed_time:0.4f} seconds")
 
     def __enter__(self):
@@ -33,7 +37,7 @@ class Timer:
 
     def __exit__(self, *exc_info):
         """Stop the context manager timer"""
-        self.stop()
+        self.stop_print()
 
 
 def timerDecorator(func):

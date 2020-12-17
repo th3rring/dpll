@@ -20,5 +20,5 @@ rand_assignment = [None] * len(rand_instance.variables)
 
 # for sol in solutions:
 #     print(sol)
-sol = solve(rand_instance, rand_assignment, random_choice)
+sol = solve(rand_instance, rand_assignment, first_choice, False)
 print(sol)

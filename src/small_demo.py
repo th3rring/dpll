@@ -4,6 +4,7 @@ from sat import solve
 from splitting_methods import first_choice
 from splitting_methods import random_choice
 from splitting_methods import two_clause_choice
+import unit_preference_methods
 
 instance = Instance()
 
@@ -19,5 +20,6 @@ assignment = [None] * len(instance.variables)
 #
 # for sol in solutions:
 #     print(sol)
-sol = solve(instance, assignment, first_choice)
+sol = solve(instance, assignment, two_clause_choice,
+            unit_preference_methods.random_choice, True)
 print(sol)

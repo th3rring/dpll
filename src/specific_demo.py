@@ -10,11 +10,25 @@ import unit_preference_methods
 from utils import Timer
 from collections import defaultdict
 
-heuristics = [two_clause_choice]
+heuristics = [first_choice]
 # heuristics = [first_choice, random_choice, two_clause_choice]
 
-n = 15
-rand_problem = random_model.generate_random_problem(n, 3 * n)
+n = 5
+rand_problem = """-x4 x3 -x2
+ x2 x0 x2
+ -x2 -x4 -x2
+ x3 -x4 x1
+ -x0 x1 x1
+ x2 -x4 x3
+ x1 x2 x1
+ x3 -x2 -x1
+ -x0 -x4 -x4
+ x0 x3 x2
+ x1 x1 x0
+ x1 -x0 -x2
+ x3 x1 x2
+ -x2 -x1 -x3
+ -x1 -x0 x0"""
 print(rand_problem)
 
 rand_instance = Instance()
@@ -25,7 +39,7 @@ rand_assignment = [None] * len(rand_instance.variables)
 timer = Timer()
 times = defaultdict(list)
 
-for i in range(0, 5):
+for i in range(0, 1):
     print("-----STARTING RUN {}-----".format(i))
     for heuristic in heuristics:
         rand_instance = Instance()
@@ -35,7 +49,7 @@ for i in range(0, 5):
 
         timer.start()
         sol = solve(rand_instance, rand_assignment, heuristic,
-                    unit_preference_methods.random_choice, False)
+                    unit_preference_methods.random_choice, True)
         tot_time = timer.stop()
         print(f"Elapsed time: {tot_time:0.4f} seconds")
 
@@ -48,3 +62,9 @@ for i in range(0, 5):
 
 for i in range(0, len(heuristics)):
     print("Heuristic {} times: {}".format(i, times[heuristics[i]]))
+
+# print(rand_instance.variables)
+# print("potential {}".format(
+#     rand_instance.check_assignment([False, False, False, True, True])))
+# print("potential {}".format(
+#     rand_instance.check_assignment([False, False, False, False, True])))
