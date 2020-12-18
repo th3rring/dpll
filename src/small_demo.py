@@ -12,6 +12,8 @@ problem = "x1 x3 -x4 \n x4 \n x2 -x3 \n -x5"
 instance.parse_problem(problem)
 instance.setup_watchlist()
 
+print(problem)
+
 assignment = [None] * len(instance.variables)
 # results = solve(instance, assignment, first_choice)
 # solutions = set()
@@ -20,6 +22,6 @@ assignment = [None] * len(instance.variables)
 #
 # for sol in solutions:
 #     print(sol)
-sol = solve(instance, assignment, two_clause_choice,
-            unit_preference_methods.random_choice, True)
+sol, _ = solve(instance, assignment, two_clause_choice,
+               unit_preference_methods.random_choice, True)
 print(sol)
