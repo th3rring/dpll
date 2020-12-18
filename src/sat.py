@@ -4,18 +4,23 @@ from utils import timerDecorator
 from utils import Timer
 
 
-def solve(instance, assignment, splitting, unit, verbose):
+def solve(instance, assignment, splitting, unit_preference, verbose):
 
+    # Init variables for state.
     n = len(instance.variables)
     state = [State(0)] * n
 
+    # Init variables to what we've done.
     to_attempt = list(range(0, n))
     previous_attempts = []
 
+    # Init boolean to hold backtracking state.
     backtrack = False
 
+    # Main loop!
     while True:
 
+        # If we reach here and there's nothing to attempt, we've solved it.
         if not to_attempt:
             # We return the first sat result we get.
             return assignment
@@ -57,13 +62,15 @@ def solve(instance, assignment, splitting, unit, verbose):
 
         # Choose a variable to try if we aren't backtracking.
         if not backtrack:
+
+            # If we're not backtracking, decide to do unit pref or splitting.
             if instance.n_clauses[1]:
 
                 # Get a list of all current unit clauses.
                 unit_clauses = instance.n_clauses[1]
 
                 # Choose a unit clause to attempt assignment using our lambda.
-                unit_clause_index = unit(instance)
+                unit_clause_index = unit_preference(instance)
 
                 # Get the variable from the selected unit clause.
                 var_to_try = unit_clauses[unit_clause_index].unassigned[0]
@@ -125,6 +132,7 @@ def solve(instance, assignment, splitting, unit, verbose):
                 false_literal = Literal(instance.variables[var_to_try], a)
 
                 if instance.update_watchlist(false_literal, assignment):
+
                     # The proposed assignment is okay, keep it.
                     if verbose:
                         print("   attempted %i, succeed." % a)
@@ -136,21 +144,27 @@ def solve(instance, assignment, splitting, unit, verbose):
                     previous_attempts.append(
                         (to_attempt.pop(idx), idx, unit_prop, potentials))
                     break
+
                 else:
+
                     # The proposed assignment causes a contradiction, revert it.
+                    assignment[var_to_try] = None
+
                     if verbose:
                         print("   attempted %i, failed." % a)
-                    assignment[var_to_try] = None
 
         # If we have to backtrack, setup for next loop.
         if backtrack:
             if not previous_attempts:
+
                 # Nowhere else to backtrack, no solutions.
                 return "UNSAT"
+
             else:
-                if verbose:
-                    print("   Backtracking...")
 
                 # Undo anything we did this loop and mark this variable as unassigned.
                 state[var_to_try] = State(0)
                 assignment[var_to_try] = None
+
+                if verbose:
+                    print("   Backtracking...")
