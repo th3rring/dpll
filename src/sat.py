@@ -17,13 +17,19 @@ def solve(instance, assignment, splitting, unit_preference, verbose):
     # Init boolean to hold backtracking state.
     backtrack = False
 
+    # Variable to track number of calls.
+    num_calls = 0
+
     # Main loop!
     while True:
+
+        # Increment number of calls:
+        num_calls += 1
 
         # If we reach here and there's nothing to attempt, we've solved it.
         if not to_attempt:
             # We return the first sat result we get.
-            return assignment
+            return assignment, num_calls
 
         # Init variables for this run.
         var_to_try = None
@@ -158,7 +164,7 @@ def solve(instance, assignment, splitting, unit_preference, verbose):
             if not previous_attempts:
 
                 # Nowhere else to backtrack, no solutions.
-                return "UNSAT"
+                return "UNSAT", num_calls
 
             else:
 
