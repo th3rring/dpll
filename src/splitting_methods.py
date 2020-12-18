@@ -3,9 +3,13 @@ from collections import defaultdict
 from random import randrange
 import random_model
 
-first_choice = lambda instance, to_attempt, assignment: 0
-random_choice = lambda instance, to_attempt, assignment: randrange(
-    0, len(to_attempt))
+
+def first_choice(instance, to_attempt, assignment):
+    return 0
+
+
+def random_choice(instance, to_attempt, assignment):
+    return randrange(0, len(to_attempt))
 
 
 def two_clause_choice(instance, to_attempt, assignment):

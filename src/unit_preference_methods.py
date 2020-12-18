@@ -1,3 +1,5 @@
 from random import randrange
 
-random_choice = lambda instance: randrange(0, len(instance.n_clauses[1]))
+
+def random_choice(instance):
+    return randrange(0, len(instance.n_clauses[1]))
