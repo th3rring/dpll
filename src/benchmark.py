@@ -65,7 +65,7 @@ def run_benchmark(n, ratio_min, ratio_max, ratio_step, timeout_seconds,
                             timer.stop()
 
                     if solve_timeout:
-                        solve_time = -1
+                        solve_time = "TIMEOUT"
                     else:
                         solve_time = timer.stop()
 
