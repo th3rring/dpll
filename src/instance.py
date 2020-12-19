@@ -93,10 +93,22 @@ class Clause():
         return self.variable_indexes
 
     def apply_assignment(self, assignment):
+
+        is_sat = False
+
+        # Check if this clause is satisfied by the assignment.
+        for literal in self:
+            if literal.eval(assignment[literal.variable.index]):
+                is_sat = True
+                break
+
         unassigned = []
-        for var in self.variable_indexes:
-            if assignment[var] is None:
-                unassigned.append(var)
+
+        # If this clause is not satisfied yet, count unassigned.
+        if not is_sat:
+            for var in self.variable_indexes:
+                if assignment[var] is None:
+                    unassigned.append(var)
         self.unassigned = unassigned
 
     def count_unassigned(self, assignment):
@@ -111,24 +123,32 @@ class Instance():
         self.clauses = []
         self.watchlist = defaultdict(deque)
         self.n_clauses = defaultdict(list)
+        self.unassigned_clauses = []
+        self.vsid = defaultdict(int)
+        self.vsid_counter = 0
+
+    def update_vsid(self, var_index):
+        self.vsid[var_index] += 1
+        self.vsid_counter += 1
+
+        if self.vsid_counter == 256:
+            for idx in self.vsid:
+                self.vsid[idx] = self.vsid[idx] / 2.0
 
     def update_assignment(self, assignment):
         n_clauses = defaultdict(list)
+        unassigned_clauses = []
 
         for clause in self.clauses:
 
-            # Ensure that we only update for unsat clauses.
-            clause_sat = False
-            for literal in clause:
-                if literal.eval(assignment[literal.variable.index]):
-                    clause_sat = True
-                    break
+            count = clause.count_unassigned(assignment)
 
-            if not clause_sat:
-                count = clause.count_unassigned(assignment)
+            if count != 0:
+                unassigned_clauses.append(clause)
                 n_clauses[count].append(clause)
 
         self.n_clauses = n_clauses
+        self.unassigned_clauses = unassigned_clauses
 
     def parse_problem(self, string_problem):
         for line in string_problem.splitlines():
@@ -168,6 +188,9 @@ class Instance():
             # Create an instance of this variable and add to this clause.
             literal = Literal(var, negated)
             cur_clause_list.append(literal)
+
+            # Update the VSIDS dictionary for this literal.
+            self.vsid[cur_index] += 1
 
         # Add the completed clause to the clause list.
         cur_clause = Clause(cur_clause_list)
