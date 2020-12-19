@@ -20,6 +20,9 @@ def solve(instance, assignment, splitting, unit_preference, verbose):
     # Variable to track number of calls.
     num_calls = 0
 
+    # Variable to track previous conflict for VSIDS.
+    prev_conflict = False
+
     # Main loop!
     while True:
 
@@ -68,6 +71,9 @@ def solve(instance, assignment, splitting, unit_preference, verbose):
 
         # Choose a variable to try if we aren't backtracking.
         if not backtrack:
+
+            # Ensure that we haven't seen a previous conflict if this is a new attempt.
+            prev_conflict = False
 
             # If we're not backtracking, decide to do unit pref or splitting.
             if instance.n_clauses[1]:
@@ -146,6 +152,11 @@ def solve(instance, assignment, splitting, unit_preference, verbose):
                     # If we find any successful assignment, don't backtrack.
                     backtrack = False
 
+                    # If we have an assignment that resolved a conflict, update vsid.
+                    if prev_conflict:
+                        instance.update_vsid(var_to_try)
+                        prev_conflict = False
+
                     # Record what we did here.
                     previous_attempts.append(
                         (to_attempt.pop(idx), idx, unit_prop, potentials))
@@ -171,6 +182,7 @@ def solve(instance, assignment, splitting, unit_preference, verbose):
                 # Undo anything we did this loop and mark this variable as unassigned.
                 state[var_to_try] = State(0)
                 assignment[var_to_try] = None
+                prev_conflict = True
 
                 if verbose:
                     print("   Backtracking...")
