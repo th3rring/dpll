@@ -159,6 +159,17 @@ def compute_jeroslow_wang(instance, var):
     return ret
 
 
+def compute_jeroslow_wang_literal(instance, var, negated):
+    ret = 0
+    for clause in instance.unassigned_clauses:
+
+        # Check if this literal is in this clause.
+        if var in clause.unassigned and negated == clause.get_literal_from_var(
+                var).negated:
+            ret += 2**(-len(set(clause.unassigned)))
+    return ret
+
+
 def jeroslow_wang_choice(instance, to_attempt, assignment):
 
     # Assuming instance has been updated already.
@@ -176,6 +187,28 @@ def jeroslow_wang_choice(instance, to_attempt, assignment):
         if j > max_j:
             max_j_var_idx = i
             max_j = j
+
+    return max_j_var_idx
+
+
+def jeroslow_wang_literal_choice(instance, to_attempt, assignment):
+
+    # Assuming instance has been updated already.
+
+    # Init variables for max search.
+    max_j_var_idx = None
+    max_j = -float("inf")
+
+    for i in range(len(to_attempt)):
+        for negated in [False, True]:
+
+            # Compute the j value for this literal.
+            j = compute_jeroslow_wang_literal(instance, to_attempt[i], negated)
+
+            # Check if this value is larger.
+            if j > max_j:
+                max_j_var_idx = i
+                max_j = j
 
     return max_j_var_idx
 
