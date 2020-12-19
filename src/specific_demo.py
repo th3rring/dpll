@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 from instance import Instance
 from sat import solve
-from splitting_methods import first_choice
-from splitting_methods import random_choice
-from splitting_methods import two_clause_choice
+from splitting_methods import *
 import random_model
-import unit_preference_methods
+from unit_preference_methods import *
 
 from utils import Timer
 from collections import defaultdict
@@ -49,7 +47,7 @@ for i in range(0, 1):
 
         timer.start()
         sol = solve(rand_instance, rand_assignment, heuristic,
-                    unit_preference_methods.random_choice, True)
+                    random_unit_choice, True)
         tot_time = timer.stop()
         print(f"Elapsed time: {tot_time:0.4f} seconds")
 
