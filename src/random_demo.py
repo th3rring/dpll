@@ -9,11 +9,13 @@ from utils import Timer
 from collections import defaultdict
 
 # heuristics = [two_clause_choice]
-heuristics = [jeroslow_wang_choice]
+heuristics = [
+    jeroslow_wang_literal_choice, jeroslow_wang_choice, two_clause_choice
+]
 # heuristics = [first_choice, random_choice, two_clause_choice]
 
 n = 150
-rand_problem = random_model.generate_random_problem(n, 3 * n)
+rand_problem = random_model.generate_random_problem(n, 4 * n)
 print(rand_problem)
 
 rand_instance = Instance()
@@ -45,5 +47,5 @@ for i in range(0, 5):
             print("Solution SAT: {}".format(
                 rand_instance.check_assignment(rand_assignment)))
 
-for i in range(0, len(heuristics)):
-    print("Heuristic {} times: {}".format(i, times[heuristics[i]]))
+for h in heuristics:
+    print("Heuristic {} times: {}".format(h.__name__, times[h]))
