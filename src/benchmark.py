@@ -66,6 +66,8 @@ def run_benchmark(n, ratio_min, ratio_max, ratio_step, timeout_seconds,
 
                     if solve_timeout:
                         solve_time = "TIMEOUT"
+                        num_calls = -1
+                        solution = "UNSAT"
                     else:
                         solve_time = timer.stop()
 
